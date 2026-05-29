@@ -1,15 +1,10 @@
+import { router } from "expo-router";
+import { useEffect } from "react";
 import { ImageBackground, StyleSheet, Text, View } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { router } from "expo-router";
-
-import { useEffect } from "react";
-
-import colors from "../constants/colors";
-
 import PrimaryButton from "../components/common/PrimaryButton";
-
+import colors from "../constants/colors";
 import { useUserStore } from "../store/useUserStore";
 
 export default function WelcomeScreen() {
@@ -21,7 +16,7 @@ export default function WelcomeScreen() {
 
   useEffect(() => {
     if (isLoggedIn && onboardingCompleted) {
-      router.replace("/index");
+      router.replace("/(tabs)");
     }
   }, [isLoggedIn, onboardingCompleted]);
 
@@ -63,49 +58,37 @@ const styles = StyleSheet.create({
 
   overlay: {
     ...StyleSheet.absoluteFillObject,
-
     backgroundColor: "rgba(0,0,0,0.48)",
   },
 
   container: {
     flex: 1,
-
     justifyContent: "flex-end",
   },
 
   bottom: {
     paddingHorizontal: 24,
-
     paddingBottom: 50,
   },
 
   logo: {
     color: colors.primary,
-
     fontSize: 22,
-
     fontWeight: "700",
-
     marginBottom: 18,
   },
 
   title: {
     color: "#fff",
-
     fontSize: 42,
-
     lineHeight: 48,
-
     fontWeight: "700",
   },
 
   subtitle: {
     color: "#D1D1D6",
-
     fontSize: 16,
-
     lineHeight: 26,
-
     marginTop: 18,
   },
 
