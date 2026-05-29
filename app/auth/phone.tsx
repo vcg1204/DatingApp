@@ -6,8 +6,7 @@ import { router } from "expo-router";
 
 import { useState } from "react";
 
-import PrimaryButton from "../../components/PrimaryButton";
-
+import PrimaryButton from "../../components/common/PrimaryButton";
 
 import { useUserStore } from "../../store/useUserStore";
 
