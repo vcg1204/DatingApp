@@ -26,7 +26,7 @@ export const createLike = async (
 };
 
 export const getIncomingLikes = async (userId: string) => {
-  const { data, error } = await supabase
+  const { data: likes, error } = await supabase
     .from("likes")
     .select("*")
     .eq("receiver_id", userId)
@@ -39,5 +39,20 @@ export const getIncomingLikes = async (userId: string) => {
     return [];
   }
 
-  return data ?? [];
+  const enrichedLikes = await Promise.all(
+    (likes || []).map(async (like) => {
+      const { data: sender } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", like.sender_id)
+        .single();
+
+      return {
+        ...like,
+        sender,
+      };
+    }),
+  );
+
+  return enrichedLikes;
 };

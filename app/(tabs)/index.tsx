@@ -142,7 +142,13 @@ export default function DiscoverScreen() {
 
     likeProfile(profile.id, comment.trim());
 
-    await createLike(userId, profile.id, comment.trim());
+    console.log("USER ID:", userId);
+
+    console.log("PROFILE ID:", profile.id);
+
+    const result = await createLike(userId, profile.id, comment.trim());
+
+    console.log("RESULT:", result);
 
     setComment("");
 

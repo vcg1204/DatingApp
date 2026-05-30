@@ -48,26 +48,20 @@ export default function FaceScanScreen() {
 
     const createdUser = await createUser({
       full_name: fullName,
-
       phone,
-
       email,
-
       gender,
-
       interested_in: interestedIn,
-
       height,
-
       dating_intention: datingIntention,
-
       face_match_score: randomScore,
-
       photos,
     });
 
-    if (createdUser?.[0]?.id) {
-      setUserId(createdUser[0].id);
+    console.log("CREATED USER:", createdUser);
+
+    if (createdUser?.id) {
+      setUserId(createdUser.id);
     }
 
     setOnboardingCompleted(true);
@@ -101,57 +95,39 @@ export default function FaceScanScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     backgroundColor: colors.background,
   },
 
   content: {
     flex: 1,
-
     justifyContent: "center",
-
     paddingHorizontal: 24,
   },
 
   iconWrapper: {
     width: 140,
-
     height: 140,
-
     borderRadius: 999,
-
     backgroundColor: colors.card,
-
     justifyContent: "center",
-
     alignItems: "center",
-
     alignSelf: "center",
-
     marginBottom: 40,
   },
 
   title: {
     color: "#fff",
-
     fontSize: 34,
-
     fontWeight: "700",
-
     textAlign: "center",
   },
 
   subtitle: {
     color: "#9A9AA3",
-
     fontSize: 16,
-
     lineHeight: 26,
-
     textAlign: "center",
-
     marginTop: 16,
-
     marginBottom: 40,
   },
 });

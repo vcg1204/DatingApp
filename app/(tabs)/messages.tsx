@@ -7,39 +7,62 @@ import {
   View,
 } from "react-native";
 
+import { useEffect, useState } from "react";
+
 import { router } from "expo-router";
 
-import colors from "../../constants/colors";
 
-const mockChats = [
-  {
-    id: "1",
+import { supabase } from "../../lib/supabase";
 
-    name: "Sophia",
-
-    message: "Hey, how’s your day going?",
-
-    time: "2m",
-
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-  },
-
-  {
-    id: "2",
-
-    name: "Ava",
-
-    message: "You seem fun 😄",
-
-    time: "12m",
-
-    image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df",
-  },
-];
+import { useUserStore } from "../../store/useUserStore";
 
 export default function MessagesScreen() {
-  const openChat = () => {
-    router.push("/(tabs)/chat");
+  const [matches, setMatches] = useState<any[]>([]);
+
+  const userId = useUserStore((state) => state.userId);
+
+  useEffect(() => {
+    loadMatches();
+  }, []);
+
+  const loadMatches = async () => {
+    const { data } = await supabase
+      .from("matches")
+      .select("*")
+      .or(`user_1.eq.${userId},user_2.eq.${userId}`);
+
+    if (!data) return;
+
+    const enriched = await Promise.all(
+      data.map(async (match) => {
+        const otherUserId =
+          match.user_1 === userId ? match.user_2 : match.user_1;
+
+        const { data: user } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", otherUserId)
+          .single();
+
+        return {
+          ...match,
+          user,
+        };
+      }),
+    );
+
+    setMatches(enriched);
+  };
+
+  const openChat = (user: any) => {
+    router.push({
+      pathname: "/(tabs)/chat",
+      params: {
+        userId: user.id,
+        name: user.full_name,
+        image: user.photos?.[0] || "",
+      },
+    });
   };
 
   return (
@@ -49,7 +72,7 @@ export default function MessagesScreen() {
       </View>
 
       <FlatList
-        data={mockChats}
+        data={matches}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -59,24 +82,24 @@ export default function MessagesScreen() {
           <TouchableOpacity
             style={styles.chatCard}
             activeOpacity={0.85}
-            onPress={openChat}
+            onPress={() => openChat(item.user)}
           >
             <Image
               source={{
-                uri: item.image,
+                uri:
+                  item.user?.photos?.[0] ||
+                  "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
               }}
               style={styles.avatar}
             />
 
             <View style={styles.chatInfo}>
-              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.name}>{item.user?.full_name || "User"}</Text>
 
               <Text numberOfLines={1} style={styles.message}>
-                {item.message}
+                Start chatting 💬
               </Text>
             </View>
-
-            <Text style={styles.time}>{item.time}</Text>
           </TouchableOpacity>
         )}
       />
@@ -87,11 +110,8 @@ export default function MessagesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     backgroundColor: "#050816",
-
     paddingHorizontal: 20,
-
     paddingTop: 60,
   },
 
@@ -101,61 +121,39 @@ const styles = StyleSheet.create({
 
   title: {
     color: "#fff",
-
     fontSize: 34,
-
     fontWeight: "700",
   },
 
   chatCard: {
     flexDirection: "row",
-
     alignItems: "center",
-
     marginBottom: 18,
-
     backgroundColor: "#0F172A",
-
     borderRadius: 24,
-
     padding: 14,
   },
 
   avatar: {
     width: 64,
-
     height: 64,
-
     borderRadius: 999,
   },
 
   chatInfo: {
     flex: 1,
-
     marginLeft: 14,
   },
 
   name: {
     color: "#fff",
-
     fontSize: 17,
-
     fontWeight: "600",
   },
 
   message: {
     color: "#9CA3AF",
-
     marginTop: 4,
-
     fontSize: 14,
-  },
-
-  time: {
-    color: colors.primary,
-
-    fontSize: 13,
-
-    fontWeight: "600",
   },
 });
